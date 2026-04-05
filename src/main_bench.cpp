@@ -91,7 +91,51 @@ Stats benchmark_mm(void (*f)(const double*, int, int, const double*, int, int, d
     return s;
 }
 
+void stride_bench() {
+    const int N = 8 * 1024 * 1024; // 8M doubles (~64 MB)
+    const int runs = 5;
+    double* arr = new double[N];
+    for (int i = 0; i < N; ++i) arr[i] = 1.0;
 
+    int strides[] = {1, 2, 4, 8, 16, 32, 64};
+    int num_strides = sizeof(strides) / sizeof(strides[0]);
+
+    cout << "\nStride benchmarks (sum over big array)\n";
+    cout << "stride,avg_time(us),stdev_time(us)\n";
+
+    for (int s = 0; s < num_strides; ++s) {
+        int stride = strides[s];
+        vector<double> times;
+        times.reserve(runs);
+
+        for (int r = 0; r < runs; ++r) {
+            auto start = chrono::high_resolution_clock::now();
+            volatile double sum = 0.0;  // volatile to avoid being optimized out
+            for (int i = 0; i < N; i += stride) {
+                sum += arr[i];
+            }
+            auto end = chrono::high_resolution_clock::now();
+            double us = chrono::duration_cast<chrono::microseconds>(end - start).count();
+            times.push_back(us);
+        }
+
+        double sum_t = 0.0;
+        for (int r = 0; r < runs; ++r) sum_t += times[r];
+        double mean = sum_t / runs;
+
+        double var = 0.0;
+        for (int r = 0; r < runs; ++r) {
+            double diff = times[r] - mean;
+            var += diff * diff;
+        }
+        var /= runs;
+        double stdev = sqrt(var);
+
+        cout << stride << "," << mean << "," << stdev << "\n";
+    }
+
+    delete[] arr;
+}
 
 int main() {
     srand(42); // seed for reproducibility
@@ -154,7 +198,6 @@ int main() {
         delete[] y;
     }
 
-
     // --------------------------------------------------
     // MATRIX-MATRIX BENCHMARKS
     // --------------------------------------------------
@@ -210,6 +253,8 @@ int main() {
         delete[] BT;
         delete[] C;
     }
+
+    stride_bench();  // extra locality experiment
 
     return 0;
 }
