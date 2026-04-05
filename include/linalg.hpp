@@ -17,4 +17,4 @@ void multiply_mm_transposed_b(const double* A, int rowsA, int colsA,
 
                               
 // later: optimized variants, e.g.
-void multiply_mm_blocked(...);
+//void multiply_mm_blocked(...);

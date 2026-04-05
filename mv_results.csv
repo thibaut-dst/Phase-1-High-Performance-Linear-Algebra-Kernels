@@ -1,0 +1,6 @@
+MV benchmarks (all sizes), row-major vs col-major
+rows,cols,avg_row(us),stdev_row(us),avg_col(us),stdev_col(us)
+128,128,5.2,0.4,9.8,1.6
+512,512,160.6,92.5929,278.2,30.1689
+1024,1024,657.4,21.1244,6208,1935.18
+4096,4096,8488,165.871,63205.6,1426.63
