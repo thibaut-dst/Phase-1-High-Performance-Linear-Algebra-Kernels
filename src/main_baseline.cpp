@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>   // malloc, free
-#include "linalg.hpp"
+#include <chrono>
+#include "linalg.cpp"
 
 using namespace std;
 
@@ -83,6 +84,54 @@ int main() {
     delete[] x;
     delete[] y_row;
     delete[] y_col;
+
+    // --- Matrix-Matrix Multiplication ---
+    double **A_, **B_, **B_T_, **C_, **C_B_T_;
+    
+    int rows_ = 1000, inner_ = 500, cols_ = 1000;
+    
+    allocate_2d_matrix(&A_, rows_, inner_);
+    
+    allocate_2d_matrix(&B_, inner_, cols_);
+    
+    allocate_2d_matrix(&B_T_, cols_, inner_);
+    
+    allocate_2d_matrix(&C_, rows_, cols_);
+    
+    allocate_2d_matrix(&C_B_T_, rows_, cols_);
+
+    auto start = chrono::high_resolution_clock::now();
+    multiply_mm_naive((double*)A_, rows_, inner_, (double*)B_, inner_, cols_, (double*)C_);
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+
+    cout << "mm_naive: " << duration.count() << " milliseconds" << endl;
+    
+    start = chrono::high_resolution_clock::now();
+    multiply_mm_transposed_b((double*)A_, rows_, inner_, (double*)B_T_, inner_, cols_, (double*)C_B_T_);
+    end = chrono::high_resolution_clock::now();
+    duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+
+    cout << "mm_transposed_b: " << duration.count() << " milliseconds" << endl;
+    
+    cout << "A\n";
+    printMatrix(A_, rows_, inner_);
+    cout << "B\n";
+    printMatrix(B_, inner_, cols_);
+    cout << "B_T\n";
+    printMatrix(B_T_, cols_, inner_);
+    cout << "C\n";
+    printMatrix(C_, rows_, cols_);
+    cout << "C_B_T\n";
+    printMatrix(C_B_T_, rows_, cols_);
+    
+    freeMatrix(&A_);
+    freeMatrix(&B_);
+    freeMatrix(&B_T_);
+    freeMatrix(&C_);
+    freeMatrix(&C_B_T_);
+    // --- Matrix-Matrix Multiplication ---
+
 
     return (ok_row && ok_col) ? 0 : 1;
 }
