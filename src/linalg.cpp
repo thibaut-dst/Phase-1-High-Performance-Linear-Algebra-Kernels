@@ -22,7 +22,7 @@ void multiply_mv_col_major(const double* matrix, int rows, int cols, const doubl
         result[i] = 0;
         for (int j = 0; j < cols; ++j)
         {
-            result[i] += matrix[i + j * rows] * vector[j];
+            result[i] += matrix[j * rows + i] * vector[j];
 
         };
     };
