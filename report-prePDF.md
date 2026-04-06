@@ -304,6 +304,10 @@ Inlining is most valuable for small helpers called in tight loops when compiling
 
 ### Part 2.5: Profiling Analysis
 
+![Profiler screenshot highlighting the dominant matrix-multiplication hotspot.](profiler_screenshot.png)
+
+*Figure: Time profiler screenshot from the repository showing the dominant hotspot in matrix-matrix multiply.*
+
 We used macOS **Instruments** (Xcode Time Profiler) to profile the matrix multiplication kernels. Key findings from the Time Profiler:
 
 #### Naive Matrix Multiplication Bottleneck
@@ -404,6 +408,33 @@ This improvement is attributable to:
 1. **Algorithm optimization (transposed-B)**: ~5.4× (dominant)
 2. **Compiler optimization level (-O0 → -O3)**: ~3–5× (SIMD, loop unrolling)
 3. **Alignment**: ~1.03× (marginal but low-cost)
+
+### Part 2.6 Addendum (Implemented Optimization in Code)
+
+To satisfy the requirement of implementing at least one significant optimization beyond the baseline set, we added a new kernel:
+
+- **`multiply_mm_blocked`** in `src/linalg.cpp`
+- Declared in `include/linalg.hpp`
+- Benchmarked in `src/main_bench.cpp`
+
+This kernel uses loop tiling (block size = 64) so each tile of `A`, `B`, and `C` fits better in cache and is reused before eviction. The blocked traversal reduces cache misses compared with both the naive row-major MM and the transposed-B baseline.
+
+**Fresh benchmark run (current implementation):**
+
+| Matrix Size | Naive (µs) | Transposed-B (µs) | Blocked (µs) | Blocked vs Naive | Blocked vs Transposed-B |
+|---|---|---|---|---|---|
+| 128×128 | 1371.67 | 986.333 | 255.333 | 5.37× faster | 3.86× faster |
+| 512×512 | 799664 | 75859 | 18586 | 43.02× faster | 4.08× faster |
+| 1024×1024 | 7.58953e+06 | 632530 | 150415 | 50.46× faster | 4.21× faster |
+| 2048×2048 | 1.37013e+08 | 6.27489e+06 | 1.74378e+06 | 78.57× faster | 3.60× faster |
+
+**Interpretation:**
+
+1. The blocked kernel outperforms both baselines at every tested size.
+2. Absolute gains increase with matrix size, consistent with cache-capacity pressure in larger working sets.
+3. Relative gain over transposed-B remains strong (about 3.6× to 4.2×), showing that blocking and transpose-based locality improvements are complementary rather than redundant.
+
+With this addition, Part 2.6 is now implemented in code, measured, and documented using new benchmark evidence.
 
 ---
 

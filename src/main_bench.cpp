@@ -201,8 +201,8 @@ int main() {
     // --------------------------------------------------
     // MATRIX-MATRIX BENCHMARKS
     // --------------------------------------------------
-    cout << "\nMM benchmarks (all sizes), naive vs transposed B\n";
-    cout << "rows,cols,avg_naive(us),stdev_naive(us),avg_transposed(us),stdev_transposed(us)\n";
+    cout << "\nMM benchmarks (all sizes), naive vs transposed B vs blocked\n";
+    cout << "rows,cols,avg_naive(us),stdev_naive(us),avg_transposed(us),stdev_transposed(us),avg_blocked(us),stdev_blocked(us)\n";
 
     // For MM, may want to avoid 4096x4096 if too slow
     for (size_t idx = 0; idx < sizes.size(); ++idx) {
@@ -244,9 +244,15 @@ int main() {
                                               BT, rowsB, colsB,
                                               C, runs_mm);
 
+           Stats stats_blocked = benchmark_mm(multiply_mm_blocked,
+                                       A, rowsA, colsA,
+                                       B, rowsB, colsB,
+                                       C, runs_mm);
+
         cout << rowsA << "," << colsB << ","
              << stats_naive.mean << "," << stats_naive.stdev << ","
-             << stats_transposed.mean << "," << stats_transposed.stdev << "\n";
+               << stats_transposed.mean << "," << stats_transposed.stdev << ","
+               << stats_blocked.mean << "," << stats_blocked.stdev << "\n";
 
         delete[] A;
         delete[] B;

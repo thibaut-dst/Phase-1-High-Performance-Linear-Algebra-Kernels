@@ -1,0 +1,6 @@
+MM benchmarks (all sizes), naive vs transposed B vs blocked
+rows,cols,avg_naive(us),stdev_naive(us),avg_transposed(us),stdev_transposed(us),avg_blocked(us),stdev_blocked(us)
+128,128,1371.67,5.31246,986.333,3.09121,255.333,0.471405
+512,512,799664,3376.05,75859,70.6305,18586,139.707
+1024,1024,7.58953e+06,81623.4,632530,5976.17,150415,337.542
+2048,2048,1.37013e+08,3.11584e+06,6.27489e+06,326501,1.74378e+06,5131.41

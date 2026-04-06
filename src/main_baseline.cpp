@@ -114,14 +114,16 @@ int main() {
     double* M2T = new double[rowsB * colsB];
     double* C_naive = new double[rowsA * colsB];
     double* C_transposed = new double[rowsA * colsB];
+    double* C_blocked = new double[rowsA * colsB];
 
-    if (!M1 || !M2 || !M2T || !C_naive || !C_transposed) {
+    if (!M1 || !M2 || !M2T || !C_naive || !C_transposed || !C_blocked) {
         cerr << "MM allocation failed\n";
         delete[] M1;
         delete[] M2;
         delete[] M2T;
         delete[] C_naive;
         delete[] C_transposed;
+        delete[] C_blocked;
         return 1;
     }
 
@@ -132,6 +134,7 @@ int main() {
         delete[] M2T;
         delete[] C_naive;
         delete[] C_transposed;
+        delete[] C_blocked;
         return 1;
     }
 
@@ -160,14 +163,17 @@ int main() {
 
     multiply_mm_naive(M1, rowsA, colsA, M2, rowsB, colsB, C_naive);
     multiply_mm_transposed_b(M1, rowsA, colsA, M2T, rowsB, colsB, C_transposed);
+    multiply_mm_blocked(M1, rowsA, colsA, M2, rowsB, colsB, C_blocked);
 
     double expected_mm[4] = {19, 22, 43, 50};
     bool ok_mm_naive = true;
     bool ok_mm_transposed = true;
+    bool ok_mm_blocked = true;
 
     for (int i = 0; i < rowsA * colsB; ++i) {
         if (C_naive[i] != expected_mm[i]) ok_mm_naive = false;
         if (C_transposed[i] != expected_mm[i]) ok_mm_transposed = false;
+        if (C_blocked[i] != expected_mm[i]) ok_mm_blocked = false;
     }
 
     cout << "Naive MM result:\n";
@@ -188,12 +194,22 @@ int main() {
     }
     cout << (ok_mm_transposed ? "[OK]\n" : "[FAIL]\n");
 
+    cout << "Blocked MM result:\n";
+    for (int i = 0; i < rowsA; ++i) {
+        for (int j = 0; j < colsB; ++j) {
+            cout << C_blocked[i * colsB + j] << " ";
+        }
+        cout << "\n";
+    }
+    cout << (ok_mm_blocked ? "[OK]\n" : "[FAIL]\n");
+
     delete[] M1;
     delete[] M2;
     delete[] M2T;
     delete[] C_naive;
     delete[] C_transposed;
+    delete[] C_blocked;
 
-    return (ok_row && ok_col && ok_mm_naive && ok_mm_transposed) ? 0 : 1;
+    return (ok_row && ok_col && ok_mm_naive && ok_mm_transposed && ok_mm_blocked) ? 0 : 1;
 
 };
