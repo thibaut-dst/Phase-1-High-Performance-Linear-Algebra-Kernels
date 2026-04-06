@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>   // malloc, free
 #include <chrono>
-#include "linalg.cpp"
+#include "../include/linalg.hpp"
 
 using namespace std;
 

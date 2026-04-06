@@ -1,4 +1,4 @@
-#include "../include/linalg.hpp"
+#include "linalg.hpp"
 #include <iostream>
 #include <vector>
 
