@@ -1,0 +1,13 @@
+MV alignment benchmark (row-major), aligned(64B) vs unaligned
+rows,cols,avg_aligned(us),stdev_aligned(us),avg_unaligned(us),stdev_unaligned(us)
+128,128,21.1,0.3,21,0
+512,512,437.3,33.5084,403.3,39.9125
+1024,1024,1491.5,148.777,1178.8,70.4341
+2048,2048,3497,440.318,3343.4,420.616
+
+MM alignment benchmark (transposed B), aligned(64B) vs unaligned
+rows,cols,avg_aligned(us),stdev_aligned(us),avg_unaligned(us),stdev_unaligned(us)
+128,128,1034.4,5.67803,1038.8,5.6356
+512,512,89527,673.395,90099.8,744.905
+1024,1024,809056,40607.9,803331,11647.1
+2048,2048,6.94888e+06,58746.5,7.20145e+06,184458

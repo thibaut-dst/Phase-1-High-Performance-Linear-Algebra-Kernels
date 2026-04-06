@@ -195,4 +195,4 @@ int main() {
 
     return (ok_row && ok_col && ok_mm_naive && ok_mm_transposed) ? 0 : 1;
 
-}
+};
