@@ -1,0 +1,13 @@
+MV inline benchmark (row-major), noinline vs inline helper
+rows,cols,avg_noinline(us),stdev_noinline(us),avg_inline(us),stdev_inline(us)
+128,128,75.9,23.4881,52.7,1.41774
+512,512,1007,100.257,1114.8,101.545
+1024,1024,4042.5,627.341,3453.5,63.3486
+2048,2048,14096,164.893,14006.8,118.801
+
+MM inline benchmark (transposed B), noinline vs inline helper
+rows,cols,avg_noinline(us),stdev_noinline(us),avg_inline(us),stdev_inline(us)
+128,128,7494.8,162.837,7481,84.2069
+512,512,528080,16598.4,529624,16508.3
+1024,1024,4.1627e+06,100600,4.0759e+06,10750.5
+2048,2048,3.32946e+07,385737,3.39343e+07,515488
