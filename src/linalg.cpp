@@ -6,6 +6,9 @@ using namespace std;
 
 void multiply_mv_row_major(const double* matrix, int rows, int cols, const double* vector, double* result)
 {
+    if (!matrix || !vector || !result) return;
+    if (rows <= 0 || cols <= 0) return;
+
     for (int i = 0; i < rows; ++i)
     {
         result[i] = 0;
@@ -20,6 +23,9 @@ void multiply_mv_row_major(const double* matrix, int rows, int cols, const doubl
 
 void multiply_mv_col_major(const double* matrix, int rows, int cols, const double* vector, double* result)
 {
+    if (!matrix || !vector || !result) return;
+    if (rows <= 0 || cols <= 0) return;
+
     for (int i = 0; i < rows; ++i)
     {
         result[i] = 0;
@@ -31,114 +37,49 @@ void multiply_mv_col_major(const double* matrix, int rows, int cols, const doubl
     };
 };
 
-void allocate_2d_matrix(double*** matrix, int rows, int cols){
-    *matrix = (double**)malloc(sizeof(double) * rows * cols);
-    
-    double (*B)[cols] = (double(*)[cols])(*matrix);
-    
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<cols;j++){
-            B[i][j] = i+j;
-        }
-    }
-}
+void multiply_mm_naive(const double* matrixA, int rowsA, int colsA, const double* matrixB, int rowsB, int colsB, double* result)
+{
+    if (!matrixA || !matrixB || !result) return;
+    if (colsA != rowsB || rowsA <= 0 || colsA <= 0 || colsB <= 0) return;
 
-void multiply_matrices(const double **A_, const double **B_, double **C_, int rows, int inner, int cols){
-    
-    
-    double (*A)[inner] = (double(*)[inner])A_;
-    double (*B)[cols] = (double(*)[cols])B_;
-    double (*C)[cols] = (double(*)[cols])C_;
-    
-    int sum;
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<cols;j++){
-            sum = 0;
-            for(int k=0;k<inner;k++){
-                sum += A[i][k]*B[k][j];
+    for (int i = 0; i < rowsA; ++i) {
+        for (int j = 0; j < colsB; ++j) {
+            result[i * colsB + j] = 0.0;
+            for (int k = 0; k < colsA; ++k) {
+                result[i * colsB + j] +=
+                    matrixA[i * colsA + k] * matrixB[k * colsB + j];
+            };
+        };
+    };
+};
+
+void multiply_mm_transposed_b(const double* matrixA, int rowsA, int colsA, const double* matrixB_transposed, int rowsB, int colsB, double* result)
+{
+    // Basic safety checks
+    if (!matrixA || !matrixB_transposed || !result) return;
+    if (rowsA <= 0 || colsA <= 0 || rowsB <= 0 || colsB <= 0) return;
+
+    // For C = A (rowsA x colsA) * B (rowsB x colsB),
+    // we need colsA == rowsB.
+    if (colsA != rowsB) return;
+
+    // Result C is rowsA x colsB, row-major.
+    // matrixA is rowsA x colsA, row-major.
+    // matrixB_transposed is the transpose of B:
+    //   original B is rowsB x colsB, row-major
+    //   BT(j, i) = B(i, j) stored as BT[j * rowsB + i]
+
+    for (int i = 0; i < rowsA; ++i) {
+        for (int j = 0; j < colsB; ++j) {
+            double sum = 0.0;
+            for (int k = 0; k < colsA; ++k) {
+                // A(i,k): row-major
+                double a_ik = matrixA[i * colsA + k];
+                // BT(j,k): row-major, BT[j * rowsB + k]
+                double bt_jk = matrixB_transposed[j * rowsB + k];
+                sum += a_ik * bt_jk;
             }
-            C[i][j] = sum;
+            result[i * colsB + j] = sum;
         }
     }
-}
-
-void multiply_mm_naive(const double* matrixA, int rowsA, int colsA, const double* matrixB, int rowsB, int colsB, double* result){
-    if(colsA!=rowsB){
-        cout << "Wrong dimensions for multiplication" << endl;
-        return;
-    }
-    
-    if((matrixA == nullptr) || (matrixB == nullptr)){
-        cout << "either or both of matrices have nullptr" << endl;
-        return;
-    }
-    
-    multiply_matrices((const double**)matrixA, (const double**)matrixB, (double**)result, rowsA, colsA, colsB);
-    
-}
-
-void allocate_2d_matrix_column_major(double*** matrix, int rows, int cols){
-    *matrix = (double**)malloc(sizeof(double) * rows * cols);
-    
-    double (*B)[rows] = (double(*)[rows])(*matrix);
-    
-    for(int i=0;i<cols;i++){
-        for(int j=0;j<rows;j++){
-            B[i][j] = i+j;
-        }
-    }
-}
-
-void multiply_matrices_tranposed_b(const double **A_, const double **B_, double **C_, int rows, int inner, int cols){
-    
-    
-    double (*A)[inner] = (double(*)[inner])A_;
-    double (*B)[inner] = (double(*)[inner])B_;
-    double (*C)[cols] = (double(*)[cols])C_;
-    
-    int sum;
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<cols;j++){
-            sum = 0;
-            for(int k=0;k<inner;k++){
-                sum += A[i][k]*B[j][k];
-            }
-            C[i][j] = sum;
-        }
-    }
-}
-
-
-void multiply_mm_transposed_b(const double* matrixA, int rowsA, int colsA, const double* matrixB_transposed, int rowsB, int colsB, double* result){
-    if(colsA!=rowsB){
-        cout << "Wrong dimensions for multiplication" << endl;
-        return;
-    }
-    
-    if((matrixA == nullptr) || (matrixB_transposed == nullptr)){
-        cout << "either or both of matrices have nullptr" << endl;
-        return;
-    }
-    
-    multiply_matrices_tranposed_b((const double**)matrixA, (const double**)matrixB_transposed, (double**)result, rowsA, colsA, colsB);
-    
-}
-
-
-void printMatrix(double **A_, int rows, int cols){
-    double (*A)[cols] = (double(*)[cols])A_;
-    
-    cout << endl;
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<cols;j++){
-            cout << A[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << "finish printing \n\n";
-}
-
-void freeMatrix(double ***A_){
-    free(*A_);
-    *A_ = nullptr;
 }

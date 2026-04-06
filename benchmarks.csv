@@ -1,0 +1,23 @@
+MV benchmarks (all sizes), row-major vs col-major
+rows,cols,avg_row(us),stdev_row(us),avg_col(us),stdev_col(us)
+128,128,12.8,5.6,22.2,0.4
+512,512,105.2,3.81576,233,31.2346
+1024,1024,876.8,4.9558,1408.8,118.29
+2048,2048,2185.6,30.8649,10928.2,306.213
+
+MM benchmarks (all sizes), naive vs transposed B
+rows,cols,avg_naive(us),stdev_naive(us),avg_transposed(us),stdev_transposed(us)
+128,128,1060.67,15.5421,466,1.41421
+512,512,120371,1222.05,50992.3,275.527
+1024,1024,1.45551e+06,53082.8,513321,11219.9
+2048,2048,2.48385e+07,615189,4.59334e+06,82390.6
+
+Stride benchmarks (sum over big array)
+stride,avg_time(us),stdev_time(us)
+1,21678.2,539.255
+2,10885.4,706.64
+4,5071,136.239
+8,2611.4,134.365
+16,2037.8,150.228
+32,980.8,52.9845
+64,544.4,39.6162
